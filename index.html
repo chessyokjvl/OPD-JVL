@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
   :root{
     --bg:#F6F5F1; --panel:#FFFFFF; --ink:#1E2A2E; --sub:#5B6B6E;
@@ -48,6 +49,13 @@
   @media(max-width:820px){.grid2{grid-template-columns:1fr}}
   .chart-box{position:relative;height:320px}
   .chart-box.short{height:280px}
+  .donut-row{display:flex;gap:16px}
+  @media(max-width:700px){.donut-row{flex-direction:column}}
+  .donut-item{flex:1;min-width:0;text-align:center}
+  .donut-item .yr{font-weight:600;font-size:13.5px;color:var(--sub);margin-bottom:6px}
+  .donut-item .chart-box{height:220px}
+  .share-legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:14px;font-size:13px;color:var(--sub)}
+  .share-legend .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-inline-end:6px;vertical-align:middle}
   table{width:100%;border-collapse:collapse;font-size:14px}
   thead th{text-align:right;color:var(--sub);font-weight:600;font-size:12.5px;padding:8px 10px;border-bottom:2px solid var(--line)}
   thead th:first-child,thead th:nth-child(2){text-align:left}
@@ -79,21 +87,25 @@
   <div class="chart-box"><canvas id="trendChart"></canvas></div>
 </div>
 
-<div class="grid2">
-  <div class="panel">
-    <h2>มูลค่าการรักษาจำแนกตามสิทธิการรักษา</h2>
-    <div class="sub">เปรียบเทียบรายปีงบประมาณ (บาท)</div>
-    <div class="chart-box"><canvas id="rightsChart"></canvas></div>
+<div class="panel">
+  <h2>มูลค่าการรักษาจำแนกตามสิทธิการรักษา</h2>
+  <div class="sub">เปรียบเทียบรายปีงบประมาณ (บาท) · ตัวเลข % คือสัดส่วนของกลุ่มสิทธินั้นต่อมูลค่ารวมของปี</div>
+  <div class="chart-box"><canvas id="rightsChart"></canvas></div>
+</div>
+
+<div class="panel">
+  <h2>สัดส่วนตามสิทธิการรักษา เปรียบเทียบ 3 ปีงบประมาณ</h2>
+  <div class="tabs" id="shareTabs">
+    <button class="tab-btn active" data-metric="value">มูลค่า</button>
+    <button class="tab-btn" data-metric="visit">Visit</button>
+    <button class="tab-btn" data-metric="person">จำนวนคน</button>
   </div>
-  <div class="panel">
-    <h2>สัดส่วนปีงบประมาณ 2569</h2>
-    <div class="tabs" id="shareTabs">
-      <button class="tab-btn active" data-metric="value">มูลค่า</button>
-      <button class="tab-btn" data-metric="visit">Visit</button>
-      <button class="tab-btn" data-metric="person">จำนวนคน</button>
-    </div>
-    <div class="chart-box short"><canvas id="shareChart"></canvas></div>
+  <div class="donut-row" id="donutRow">
+    <div class="donut-item"><div class="yr">ปีงบประมาณ 2567</div><div class="chart-box"><canvas id="donut2567"></canvas></div></div>
+    <div class="donut-item"><div class="yr">ปีงบประมาณ 2568</div><div class="chart-box"><canvas id="donut2568"></canvas></div></div>
+    <div class="donut-item"><div class="yr">ปีงบประมาณ 2569</div><div class="chart-box"><canvas id="donut2569"></canvas></div></div>
   </div>
+  <div class="share-legend" id="shareLegend"></div>
 </div>
 
 <div class="panel">
@@ -159,16 +171,24 @@ document.getElementById('kpiGrid').innerHTML = kpis.map(k=>{
 }).join('');
 
 // Charts (guarded so a chart-lib issue never blocks the table/insight below)
+const colors=['#0F5C57','#3C8C82','#C97A2E','#B3542E'];
 try{
   if(typeof Chart === 'undefined') throw new Error('Chart.js failed to load');
+  if(typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
+  Chart.defaults.font.family = "'Sarabun', sans-serif";
 
   new Chart(document.getElementById('trendChart'),{
     type:'line',
     data:{labels:years.map(String),datasets:[
-      {label:'มูลค่ารวม',data:years.map(y=>totals(y).value),borderColor:'#0F5C57',backgroundColor:'#0F5C57',tension:.3,fill:false,pointRadius:4},
-      {label:'มูลค่ายา',data:years.map(y=>totals(y).drug),borderColor:'#C97A2E',backgroundColor:'#C97A2E',tension:.3,fill:false,pointRadius:4},
+      {label:'มูลค่ารวม',data:years.map(y=>totals(y).value),borderColor:'#0F5C57',backgroundColor:'#0F5C57',tension:.3,fill:false,pointRadius:4,
+        datalabels:{align:'top',color:'#0F5C57',font:{size:11,weight:600},
+          formatter:(v,ctx)=>{ if(ctx.dataIndex===0) return ''; const prev=totals(years[ctx.dataIndex-1]).value; return (v>=prev?'+':'')+(((v-prev)/prev)*100).toFixed(1)+'%'; }}},
+      {label:'มูลค่ายา',data:years.map(y=>totals(y).drug),borderColor:'#C97A2E',backgroundColor:'#C97A2E',tension:.3,fill:false,pointRadius:4,
+        datalabels:{align:'bottom',color:'#C97A2E',font:{size:11,weight:600},
+          formatter:(v,ctx)=>totals(years[ctx.dataIndex]).drugpct.toFixed(1)+'% ของมูลค่ารวม'}},
     ]},
     options:{responsive:true,maintainAspectRatio:false,
+      layout:{padding:{top:10,bottom:10}},
       plugins:{legend:{position:'top'}},
       scales:{y:{ticks:{callback:v=>(v/1e6).toFixed(0)+'M'}}}}
   });
@@ -178,31 +198,47 @@ try{
     data:{labels:years.map(String),datasets:groups.map((g,i)=>({
       label:groupLabel[g],
       data:years.map(y=>raw.find(r=>r.y===y&&r.g===g).value),
-      backgroundColor:['#0F5C57','#3C8C82','#C97A2E','#B3542E'][i]
+      backgroundColor:colors[i]
     }))},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}}},
+      plugins:{
+        legend:{position:'top',labels:{boxWidth:12,font:{size:11}}},
+        datalabels:{color:'#fff',font:{size:10,weight:600},rotation:-90,anchor:'center',align:'center',
+          formatter:(v,ctx)=>{ const y=years[ctx.dataIndex]; const g=groups[ctx.datasetIndex];
+            const rec=raw.find(r=>r.y===y&&r.g===g); return rec.valpct.toFixed(0)+'%'; }}
+      },
       scales:{y:{ticks:{callback:v=>(v/1e6).toFixed(0)+'M'}}}}
   });
 
-  let shareChart;
-  function drawShare(metric){
-    const y2569 = raw.filter(r=>r.y===2569 && !r.total);
-    const data = y2569.map(r=>r[metric]);
-    const cfg = {
-      type:'doughnut',
-      data:{labels:groups.map(g=>groupLabel[g]),datasets:[{data,backgroundColor:['#0F5C57','#3C8C82','#C97A2E','#B3542E']}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}
-    };
-    if(shareChart) shareChart.destroy();
-    shareChart = new Chart(document.getElementById('shareChart'), cfg);
+  // Three synced donuts (2567 / 2568 / 2569), switchable metric
+  const donutCanvases={2567:'donut2567',2568:'donut2568',2569:'donut2569'};
+  let donutCharts={};
+  function drawDonuts(metric){
+    Object.values(donutCharts).forEach(c=>c.destroy());
+    donutCharts={};
+    years.forEach(y=>{
+      const rows = raw.filter(r=>r.y===y && !r.total);
+      const data = rows.map(r=>r[metric]);
+      donutCharts[y] = new Chart(document.getElementById(donutCanvases[y]),{
+        type:'doughnut',
+        data:{labels:groups.map(g=>groupLabel[g]),datasets:[{data,backgroundColor:colors}]},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{
+            legend:{display:false},
+            datalabels:{color:'#fff',font:{size:11,weight:600},
+              formatter:(v)=>{ const total=data.reduce((a,b)=>a+b,0); return (v/total*100).toFixed(1)+'%'; }}
+          }}
+      });
+    });
   }
-  drawShare('value');
+  drawDonuts('value');
+  document.getElementById('shareLegend').innerHTML = groups.map((g,i)=>
+    `<span><span class="sw" style="background:${colors[i]}"></span>${groupLabel[g]}</span>`).join('');
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
-      drawShare(btn.dataset.metric);
+      drawDonuts(btn.dataset.metric);
     });
   });
 }catch(err){
