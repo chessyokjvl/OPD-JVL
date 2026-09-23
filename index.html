@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>สรุปจำนวนและมูลค่าการรักษา OPD ปีงบประมาณ 2567-2569 : รพ.จิตเวชเลยราชนครินทร์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#F6F5F1; --panel:#FFFFFF; --ink:#1E2A2E; --sub:#5B6B6E;
+    --teal:#0F5C57; --teal-l:#3C8C82; --amber:#C97A2E; --clay:#B3542E;
+    --line:#E1DFD6; --pos:#2E7D5B; --neg:#B3542E;
+    --card-r:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12181A; --panel:#182225; --ink:#EDEFEE; --sub:#9FB0B2; --line:#2A3538;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12181A; --panel:#182225; --ink:#EDEFEE; --sub:#9FB0B2; --line:#2A3538;
+  }
+  *{box-sizing:border-box}
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Sarabun',sans-serif; font-weight:400;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 56px}
+  header{border-bottom:3px solid var(--teal);padding-bottom:18px;margin-bottom:26px}
+  .eyebrow{color:var(--teal);font-weight:600;font-size:14px;letter-spacing:.02em}
+  h1{font-size:clamp(22px,3.4vw,32px);font-weight:700;margin:6px 0 8px;line-height:1.3}
+  .meta{color:var(--sub);font-size:14.5px;line-height:1.7}
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:28px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--card-r);padding:18px 20px}
+  .kpi .label{color:var(--sub);font-size:13.5px;margin-bottom:8px}
+  .kpi .value{font-size:26px;font-weight:700;line-height:1.15}
+  .kpi .delta{font-size:13.5px;margin-top:6px;font-weight:500}
+  .delta.pos{color:var(--pos)} .delta.neg{color:var(--neg)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--card-r);padding:20px;margin-bottom:22px}
+  .panel h2{font-size:17px;margin:0 0 4px;font-weight:600}
+  .panel .sub{color:var(--sub);font-size:13.5px;margin-bottom:14px}
+  .grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr}}
+  .chart-box{position:relative;height:320px}
+  .chart-box.short{height:280px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead th{text-align:right;color:var(--sub);font-weight:600;font-size:12.5px;padding:8px 10px;border-bottom:2px solid var(--line)}
+  thead th:first-child,thead th:nth-child(2){text-align:left}
+  tbody td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line)}
+  tbody td:first-child,tbody td:nth-child(2){text-align:left}
+  tbody tr.total td{font-weight:700;background:rgba(15,92,87,.06)}
+  .scroll-x{overflow-x:auto}
+  .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .tab-btn{border:1px solid var(--line);background:transparent;color:var(--sub);padding:6px 14px;border-radius:20px;font-family:inherit;font-size:13.5px;cursor:pointer}
+  .tab-btn.active{background:var(--teal);border-color:var(--teal);color:#fff}
+  .insight{background:rgba(201,122,46,.08);border-inline-start:4px solid var(--amber);border-radius:6px;padding:14px 16px;font-size:14.5px;line-height:1.75}
+  .insight b{color:var(--clay)}
+  footer{color:var(--sub);font-size:12.5px;text-align:center;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">กลุ่มงานพัฒนาคุณภาพบริการและมาตรฐาน · รพ.จิตเวชเลยราชนครินทร์</div>
+  <h1>จำนวนและมูลค่าการรักษาผู้ป่วยนอก (OPD) ปีงบประมาณ 2567–2569</h1>
+  <div class="meta">สรุปเชิงบริหารเพื่อประกอบการพิจารณาจัดสรรงบประมาณ · จำแนกตามกลุ่มสิทธิการรักษา<br><b>หมายเหตุ:</b> ข้อมูลปีงบประมาณ 2569 เป็นข้อมูล ณ วันที่ 11 กันยายน 2569 (ยังไม่ครบปีงบประมาณ)</div>
+</header>
+
+<div class="kpi-grid" id="kpiGrid"></div>
+
+<div class="panel">
+  <h2>แนวโน้มมูลค่าการรักษาและมูลค่ายา 3 ปีงบประมาณ</h2>
+  <div class="sub">มูลค่ารวม เทียบกับ มูลค่ายา (บาท)</div>
+  <div class="chart-box"><canvas id="trendChart"></canvas></div>
+</div>
+
+<div class="grid2">
+  <div class="panel">
+    <h2>มูลค่าการรักษาจำแนกตามสิทธิการรักษา</h2>
+    <div class="sub">เปรียบเทียบรายปีงบประมาณ (บาท)</div>
+    <div class="chart-box"><canvas id="rightsChart"></canvas></div>
+  </div>
+  <div class="panel">
+    <h2>สัดส่วนปีงบประมาณ 2569</h2>
+    <div class="tabs" id="shareTabs">
+      <button class="tab-btn active" data-metric="value">มูลค่า</button>
+      <button class="tab-btn" data-metric="visit">Visit</button>
+      <button class="tab-btn" data-metric="person">จำนวนคน</button>
+    </div>
+    <div class="chart-box short"><canvas id="shareChart"></canvas></div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>ข้อสังเกตสำหรับการพิจารณางบประมาณ</h2>
+  <div class="insight" id="insightBox"></div>
+</div>
+
+<div class="panel">
+  <h2>ตารางข้อมูลรายละเอียด</h2>
+  <div class="scroll-x">
+    <table id="dataTable">
+      <thead><tr>
+        <th>ปีงบประมาณ</th><th>สิทธิการรักษา</th><th>Visit</th><th>ร้อยละ</th>
+        <th>จำนวนคน</th><th>ร้อยละ</th><th>มูลค่ารวม (บาท)</th><th>ร้อยละ</th>
+        <th>มูลค่ายา (บาท)</th><th>ร้อยละค่ายา</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>จัดทำโดยกลุ่มงานพัฒนาคุณภาพบริการและมาตรฐาน โรงพยาบาลจิตเวชเลยราชนครินทร์ · ข้อมูล ณ ปีงบประมาณ 2567–2569 (ปีงบ 2569 ข้อมูล ณ 11 ก.ย. 2569)</footer>
+</div>
+
+<script>
+const raw = [
+ {y:2567,g:"1_บัตรทอง",visit:33793,vpct:74.41,person:9547,ppct:74.31,value:18153238.50,valpct:60.63,drug:15257841.00,drugpct:84.05},
+ {y:2567,g:"2_เบิกได้เบิกตรง",visit:5469,vpct:12.04,person:1604,ppct:12.48,value:8919263.50,valpct:29.79,drug:8317253.50,drugpct:93.25},
+ {y:2567,g:"3_ประกันสังคม",visit:2062,vpct:4.54,person:593,ppct:4.62,value:864710.75,valpct:2.89,drug:694295.75,drugpct:80.29},
+ {y:2567,g:"4_ชำระเงิน",visit:4091,vpct:9.01,person:2186,ppct:17.01,value:2003785.25,valpct:6.69,drug:1451685.25,drugpct:72.45},
+ {y:2567,g:"รวมทั้งปี",visit:45415,vpct:100,person:12848,ppct:100,value:29940998.00,valpct:100,drug:25721075.50,drugpct:85.91,total:true},
+ {y:2568,g:"1_บัตรทอง",visit:32121,vpct:73.12,person:8581,ppct:71.79,value:20314130.25,valpct:58.37,drug:17481206.25,drugpct:86.05},
+ {y:2568,g:"2_เบิกได้เบิกตรง",visit:5525,vpct:12.58,person:1627,ppct:13.61,value:11260273.50,valpct:32.35,drug:10682213.50,drugpct:94.87},
+ {y:2568,g:"3_ประกันสังคม",visit:2201,vpct:5.01,person:560,ppct:4.69,value:933845.75,valpct:2.68,drug:758825.75,drugpct:81.26},
+ {y:2568,g:"4_ชำระเงิน",visit:4083,vpct:9.29,person:2326,ppct:19.46,value:2296246.50,valpct:6.60,drug:1820466.50,drugpct:79.28},
+ {y:2568,g:"รวมทั้งปี",visit:43930,vpct:100,person:11953,ppct:100,value:34804496.00,valpct:100,drug:30742712.00,drugpct:88.33,total:true},
+ {y:2569,g:"1_บัตรทอง",visit:32723,vpct:72.12,person:8519,ppct:70.39,value:19688613.75,valpct:52.85,drug:16726857.25,drugpct:84.96},
+ {y:2569,g:"2_เบิกได้เบิกตรง",visit:6414,vpct:14.14,person:1797,ppct:14.85,value:14388103.00,valpct:38.62,drug:13402463.00,drugpct:93.15},
+ {y:2569,g:"3_ประกันสังคม",visit:2280,vpct:5.03,person:531,ppct:4.39,value:1005813.25,valpct:2.70,drug:781458.25,drugpct:77.69},
+ {y:2569,g:"4_ชำระเงิน",visit:3954,vpct:8.71,person:2283,ppct:18.86,value:2170147.75,valpct:5.83,drug:1682032.75,drugpct:77.51},
+ {y:2569,g:"รวมทั้งปี",visit:45371,vpct:100,person:12102,ppct:100,value:37252677.75,valpct:100,drug:32592811.25,drugpct:87.49,total:true},
+];
+const years=[2567,2568,2569];
+const groups=["1_บัตรทอง","2_เบิกได้เบิกตรง","3_ประกันสังคม","4_ชำระเงิน"];
+const groupLabel={"1_บัตรทอง":"บัตรทอง","2_เบิกได้เบิกตรง":"เบิกได้เบิกตรง","3_ประกันสังคม":"ประกันสังคม","4_ชำระเงิน":"ชำระเงิน"};
+const nf = n => Math.round(n).toLocaleString('th-TH');
+const totals = y => raw.find(r=>r.y===y && r.total);
+
+// KPI cards
+const t67=totals(2567), t69=totals(2569);
+const pct = (a,b)=> (((b-a)/a)*100).toFixed(1);
+const kpis = [
+ {label:"มูลค่าการรักษารวม ปี 2569",value:"฿"+nf(t69.value),delta:pct(t67.value,t69.value)+"% เทียบปี 2567"},
+ {label:"มูลค่ายา ปี 2569",value:"฿"+nf(t69.drug),delta:pct(t67.drug,t69.drug)+"% เทียบปี 2567"},
+ {label:"สัดส่วนค่ายาในมูลค่ารวม 2569",value:t69.drugpct.toFixed(1)+"%",delta:"ปี 2567: "+t67.drugpct.toFixed(1)+"%"},
+ {label:"จำนวน Visit ปี 2569",value:nf(t69.visit),delta:pct(t67.visit,t69.visit)+"% เทียบปี 2567"},
+];
+document.getElementById('kpiGrid').innerHTML = kpis.map(k=>{
+  const num = parseFloat(k.delta);
+  const cls = isNaN(num)? "" : (num>=0?"pos":"neg");
+  const arrow = isNaN(num)? "" : (num>=0?"▲ ":"▼ ");
+  return `<div class="kpi"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="delta ${cls}">${arrow}${k.delta}</div></div>`;
+}).join('');
+
+// Charts (guarded so a chart-lib issue never blocks the table/insight below)
+try{
+  if(typeof Chart === 'undefined') throw new Error('Chart.js failed to load');
+
+  new Chart(document.getElementById('trendChart'),{
+    type:'line',
+    data:{labels:years.map(String),datasets:[
+      {label:'มูลค่ารวม',data:years.map(y=>totals(y).value),borderColor:'#0F5C57',backgroundColor:'#0F5C57',tension:.3,fill:false,pointRadius:4},
+      {label:'มูลค่ายา',data:years.map(y=>totals(y).drug),borderColor:'#C97A2E',backgroundColor:'#C97A2E',tension:.3,fill:false,pointRadius:4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top'}},
+      scales:{y:{ticks:{callback:v=>(v/1e6).toFixed(0)+'M'}}}}
+  });
+
+  new Chart(document.getElementById('rightsChart'),{
+    type:'bar',
+    data:{labels:years.map(String),datasets:groups.map((g,i)=>({
+      label:groupLabel[g],
+      data:years.map(y=>raw.find(r=>r.y===y&&r.g===g).value),
+      backgroundColor:['#0F5C57','#3C8C82','#C97A2E','#B3542E'][i]
+    }))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}}},
+      scales:{y:{ticks:{callback:v=>(v/1e6).toFixed(0)+'M'}}}}
+  });
+
+  let shareChart;
+  function drawShare(metric){
+    const y2569 = raw.filter(r=>r.y===2569 && !r.total);
+    const data = y2569.map(r=>r[metric]);
+    const cfg = {
+      type:'doughnut',
+      data:{labels:groups.map(g=>groupLabel[g]),datasets:[{data,backgroundColor:['#0F5C57','#3C8C82','#C97A2E','#B3542E']}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}
+    };
+    if(shareChart) shareChart.destroy();
+    shareChart = new Chart(document.getElementById('shareChart'), cfg);
+  }
+  drawShare('value');
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      drawShare(btn.dataset.metric);
+    });
+  });
+}catch(err){
+  console.error('Chart render failed:', err);
+  document.querySelectorAll('.chart-box').forEach(box=>{
+    box.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:13.5px">ไม่สามารถโหลดกราฟได้ในขณะนี้</div>';
+  });
+}
+
+// Table
+const tbody = document.querySelector('#dataTable tbody');
+tbody.innerHTML = raw.map(r=>`<tr class="${r.total?'total':''}">
+  <td>${r.y}</td><td>${r.total?'รวมทั้งปี':groupLabel[r.g]}</td>
+  <td>${nf(r.visit)}</td><td>${r.vpct.toFixed(2)}%</td>
+  <td>${nf(r.person)}</td><td>${r.ppct.toFixed(2)}%</td>
+  <td>${nf(r.value)}</td><td>${r.valpct.toFixed(2)}%</td>
+  <td>${nf(r.drug)}</td><td>${r.drugpct.toFixed(2)}%</td>
+</tr>`).join('');
+
+// Insight
+document.getElementById('insightBox').innerHTML =
+ `มูลค่าการรักษารวมเพิ่มขึ้นจาก <b>฿${nf(t67.value)}</b> ในปี 2567 เป็น <b>฿${nf(t69.value)}</b> ในปี 2569 (+${pct(t67.value,t69.value)}%) `+
+ `ในขณะที่จำนวน Visit และจำนวนผู้ป่วยแทบไม่เปลี่ยนแปลง สะท้อนว่า<b>ต้นทุนต่อการรักษาต่อครั้งสูงขึ้นชัดเจน</b> `+
+ `โดยมูลค่ายาคิดเป็นสัดส่วนสูงถึง <b>${t69.drugpct.toFixed(1)}%</b> ของมูลค่ารวมในปี 2569 และกลุ่มสิทธิ<b>เบิกได้เบิกตรง</b>มีมูลค่าเติบโตเร็วที่สุด `+
+ `(จาก ฿${nf(raw.find(r=>r.y===2567&&r.g==="2_เบิกได้เบิกตรง").value)} เป็น ฿${nf(raw.find(r=>r.y===2569&&r.g==="2_เบิกได้เบิกตรง").value)}, +${pct(raw.find(r=>r.y===2567&&r.g==="2_เบิกได้เบิกตรง").value,raw.find(r=>r.y===2569&&r.g==="2_เบิกได้เบิกตรง").value)}%) `+
+ `จึงควรพิจารณาจัดสรรงบประมาณเพิ่มเติมให้สอดคล้องกับต้นทุนยาและค่ารักษาที่สูงขึ้น แม้ปริมาณผู้รับบริการจะทรงตัว `+
+ `<br><br><i>หมายเหตุ: ข้อมูลปีงบประมาณ 2569 นับถึงวันที่ 11 กันยายน 2569 เท่านั้น ยังไม่ครบปีงบประมาณ ตัวเลขจึงมีแนวโน้มสูงขึ้นอีกเมื่อสิ้นปีงบประมาณ</i>`;
+</script>
+</body>
+</html>
