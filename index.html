@@ -77,6 +77,10 @@
   <div class="eyebrow">กลุ่มงานพัฒนาคุณภาพบริการและมาตรฐาน · รพ.จิตเวชเลยราชนครินทร์</div>
   <h1>จำนวนและมูลค่าการรักษาผู้ป่วยนอก (OPD) ปีงบประมาณ 2567–2569</h1>
   <div class="meta">สรุปเชิงบริหารเพื่อประกอบการพิจารณาจัดสรรงบประมาณ · จำแนกตามกลุ่มสิทธิการรักษา<br><b>หมายเหตุ:</b> ข้อมูลปีงบประมาณ 2569 เป็นข้อมูล ณ วันที่ 11 กันยายน 2569 (ยังไม่ครบปีงบประมาณ)</div>
+  <div class="tabs" id="datasetTabs" style="margin-top:16px">
+    <button class="tab-btn active" data-ds="all">เขตสุขภาพที่ 8 (7 จังหวัด)</button>
+    <button class="tab-btn" data-ds="loei">เฉพาะจังหวัดเลย</button>
+  </div>
 </header>
 
 <div class="kpi-grid" id="kpiGrid"></div>
@@ -131,94 +135,121 @@
 </div>
 
 <script>
-const raw = [
- {y:2567,g:"1_บัตรทอง",visit:33793,vpct:74.41,person:9547,ppct:74.31,value:18153238.50,valpct:60.63,drug:15257841.00,drugpct:84.05},
- {y:2567,g:"2_เบิกได้เบิกตรง",visit:5469,vpct:12.04,person:1604,ppct:12.48,value:8919263.50,valpct:29.79,drug:8317253.50,drugpct:93.25},
- {y:2567,g:"3_ประกันสังคม",visit:2062,vpct:4.54,person:593,ppct:4.62,value:864710.75,valpct:2.89,drug:694295.75,drugpct:80.29},
- {y:2567,g:"4_ชำระเงิน",visit:4091,vpct:9.01,person:2186,ppct:17.01,value:2003785.25,valpct:6.69,drug:1451685.25,drugpct:72.45},
- {y:2567,g:"รวมทั้งปี",visit:45415,vpct:100,person:12848,ppct:100,value:29940998.00,valpct:100,drug:25721075.50,drugpct:85.91,total:true},
- {y:2568,g:"1_บัตรทอง",visit:32121,vpct:73.12,person:8581,ppct:71.79,value:20314130.25,valpct:58.37,drug:17481206.25,drugpct:86.05},
- {y:2568,g:"2_เบิกได้เบิกตรง",visit:5525,vpct:12.58,person:1627,ppct:13.61,value:11260273.50,valpct:32.35,drug:10682213.50,drugpct:94.87},
- {y:2568,g:"3_ประกันสังคม",visit:2201,vpct:5.01,person:560,ppct:4.69,value:933845.75,valpct:2.68,drug:758825.75,drugpct:81.26},
- {y:2568,g:"4_ชำระเงิน",visit:4083,vpct:9.29,person:2326,ppct:19.46,value:2296246.50,valpct:6.60,drug:1820466.50,drugpct:79.28},
- {y:2568,g:"รวมทั้งปี",visit:43930,vpct:100,person:11953,ppct:100,value:34804496.00,valpct:100,drug:30742712.00,drugpct:88.33,total:true},
- {y:2569,g:"1_บัตรทอง",visit:32723,vpct:72.12,person:8519,ppct:70.39,value:19688613.75,valpct:52.85,drug:16726857.25,drugpct:84.96},
- {y:2569,g:"2_เบิกได้เบิกตรง",visit:6414,vpct:14.14,person:1797,ppct:14.85,value:14388103.00,valpct:38.62,drug:13402463.00,drugpct:93.15},
- {y:2569,g:"3_ประกันสังคม",visit:2280,vpct:5.03,person:531,ppct:4.39,value:1005813.25,valpct:2.70,drug:781458.25,drugpct:77.69},
- {y:2569,g:"4_ชำระเงิน",visit:3954,vpct:8.71,person:2283,ppct:18.86,value:2170147.75,valpct:5.83,drug:1682032.75,drugpct:77.51},
- {y:2569,g:"รวมทั้งปี",visit:45371,vpct:100,person:12102,ppct:100,value:37252677.75,valpct:100,drug:32592811.25,drugpct:87.49,total:true},
-];
+const datasets = {
+  all: [
+    {y:2567,g:"1_บัตรทอง",visit:33793,vpct:74.41,person:9547,ppct:74.31,value:18153238.50,valpct:60.63,drug:15257841.00,drugpct:84.05},
+    {y:2567,g:"2_เบิกได้เบิกตรง",visit:5469,vpct:12.04,person:1604,ppct:12.48,value:8919263.50,valpct:29.79,drug:8317253.50,drugpct:93.25},
+    {y:2567,g:"3_ประกันสังคม",visit:2062,vpct:4.54,person:593,ppct:4.62,value:864710.75,valpct:2.89,drug:694295.75,drugpct:80.29},
+    {y:2567,g:"4_ชำระเงิน",visit:4091,vpct:9.01,person:2186,ppct:17.01,value:2003785.25,valpct:6.69,drug:1451685.25,drugpct:72.45},
+    {y:2567,g:"รวมทั้งปี",visit:45415,vpct:100,person:12848,ppct:100,value:29940998.00,valpct:100,drug:25721075.50,drugpct:85.91,total:true},
+    {y:2568,g:"1_บัตรทอง",visit:32121,vpct:73.12,person:8581,ppct:71.79,value:20314130.25,valpct:58.37,drug:17481206.25,drugpct:86.05},
+    {y:2568,g:"2_เบิกได้เบิกตรง",visit:5525,vpct:12.58,person:1627,ppct:13.61,value:11260273.50,valpct:32.35,drug:10682213.50,drugpct:94.87},
+    {y:2568,g:"3_ประกันสังคม",visit:2201,vpct:5.01,person:560,ppct:4.69,value:933845.75,valpct:2.68,drug:758825.75,drugpct:81.26},
+    {y:2568,g:"4_ชำระเงิน",visit:4083,vpct:9.29,person:2326,ppct:19.46,value:2296246.50,valpct:6.60,drug:1820466.50,drugpct:79.28},
+    {y:2568,g:"รวมทั้งปี",visit:43930,vpct:100,person:11953,ppct:100,value:34804496.00,valpct:100,drug:30742712.00,drugpct:88.33,total:true},
+    {y:2569,g:"1_บัตรทอง",visit:32723,vpct:72.12,person:8519,ppct:70.39,value:19688613.75,valpct:52.85,drug:16726857.25,drugpct:84.96},
+    {y:2569,g:"2_เบิกได้เบิกตรง",visit:6414,vpct:14.14,person:1797,ppct:14.85,value:14388103.00,valpct:38.62,drug:13402463.00,drugpct:93.15},
+    {y:2569,g:"3_ประกันสังคม",visit:2280,vpct:5.03,person:531,ppct:4.39,value:1005813.25,valpct:2.70,drug:781458.25,drugpct:77.69},
+    {y:2569,g:"4_ชำระเงิน",visit:3954,vpct:8.71,person:2283,ppct:18.86,value:2170147.75,valpct:5.83,drug:1682032.75,drugpct:77.51},
+    {y:2569,g:"รวมทั้งปี",visit:45371,vpct:100,person:12102,ppct:100,value:37252677.75,valpct:100,drug:32592811.25,drugpct:87.49,total:true},
+  ],
+  loei: [
+    {y:2567,g:"1_บัตรทอง",visit:29011,vpct:77.52,person:7576,ppct:77.00,value:16050722.25,valpct:64.63,drug:13497389.75,drugpct:84.09},
+    {y:2567,g:"2_เบิกได้เบิกตรง",visit:4600,vpct:12.29,person:1353,ppct:13.75,value:7061099.75,valpct:28.43,drug:6557889.75,drugpct:92.87},
+    {y:2567,g:"3_ประกันสังคม",visit:1847,vpct:4.94,person:522,ppct:5.31,value:783046.25,valpct:3.15,drug:628131.25,drugpct:80.22},
+    {y:2567,g:"4_ชำระเงิน",visit:1966,vpct:5.25,person:1131,ppct:11.50,value:941559.25,valpct:3.79,drug:574079.25,drugpct:60.97},
+    {y:2567,g:"รวมทั้งปี",visit:37424,vpct:100,person:9839,ppct:100,value:24836427.50,valpct:100,drug:21257490.00,drugpct:85.59,total:true},
+    {y:2568,g:"1_บัตรทอง",visit:28550,vpct:75.66,person:7187,ppct:74.75,value:18212336.00,valpct:61.71,drug:15677764.50,drugpct:86.08},
+    {y:2568,g:"2_เบิกได้เบิกตรง",visit:4748,vpct:12.58,person:1382,ppct:14.37,value:9288649.65,valpct:31.47,drug:8799324.65,drugpct:94.73},
+    {y:2568,g:"3_ประกันสังคม",visit:1967,vpct:5.21,person:492,ppct:5.12,value:835617.25,valpct:2.83,drug:676927.25,drugpct:81.01},
+    {y:2568,g:"4_ชำระเงิน",visit:2471,vpct:6.55,person:1491,ppct:15.51,value:1175776.25,valpct:3.98,drug:859151.25,drugpct:73.07},
+    {y:2568,g:"รวมทั้งปี",visit:37736,vpct:100,person:9615,ppct:100,value:29512379.15,valpct:100,drug:26013167.65,drugpct:88.14,total:true},
+    {y:2569,g:"1_บัตรทอง",visit:29898,vpct:75.34,person:7542,ppct:74.87,value:18056830.25,valpct:57.15,drug:15342120.75,drugpct:84.97},
+    {y:2569,g:"2_เบิกได้เบิกตรง",visit:5452,vpct:13.74,person:1546,ppct:15.35,value:11545194.25,valpct:36.54,drug:10749209.25,drugpct:93.11},
+    {y:2569,g:"3_ประกันสังคม",visit:2063,vpct:5.20,person:482,ppct:4.79,value:898604.75,valpct:2.84,drug:694669.75,drugpct:77.31},
+    {y:2569,g:"4_ชำระเงิน",visit:2272,vpct:5.73,person:1349,ppct:13.39,value:1092569.00,valpct:3.46,drug:781744.00,drugpct:71.55},
+    {y:2569,g:"รวมทั้งปี",visit:39685,vpct:100,person:10073,ppct:100,value:31593198.25,valpct:100,drug:27567743.75,drugpct:87.26,total:true},
+  ],
+};
 const years=[2567,2568,2569];
 const groups=["1_บัตรทอง","2_เบิกได้เบิกตรง","3_ประกันสังคม","4_ชำระเงิน"];
 const groupLabel={"1_บัตรทอง":"บัตรทอง","2_เบิกได้เบิกตรง":"เบิกได้เบิกตรง","3_ประกันสังคม":"ประกันสังคม","4_ชำระเงิน":"ชำระเงิน"};
-const nf = n => Math.round(n).toLocaleString('th-TH');
-const totals = y => raw.find(r=>r.y===y && r.total);
-
-// KPI cards
-const t67=totals(2567), t69=totals(2569);
-const pct = (a,b)=> (((b-a)/a)*100).toFixed(1);
-const kpis = [
- {label:"มูลค่าการรักษารวม ปี 2569",value:"฿"+nf(t69.value),delta:pct(t67.value,t69.value)+"% เทียบปี 2567"},
- {label:"มูลค่ายา ปี 2569",value:"฿"+nf(t69.drug),delta:pct(t67.drug,t69.drug)+"% เทียบปี 2567"},
- {label:"สัดส่วนค่ายาในมูลค่ารวม 2569",value:t69.drugpct.toFixed(1)+"%",delta:"ปี 2567: "+t67.drugpct.toFixed(1)+"%"},
- {label:"จำนวน Visit ปี 2569",value:nf(t69.visit),delta:pct(t67.visit,t69.visit)+"% เทียบปี 2567"},
-];
-document.getElementById('kpiGrid').innerHTML = kpis.map(k=>{
-  const num = parseFloat(k.delta);
-  const cls = isNaN(num)? "" : (num>=0?"pos":"neg");
-  const arrow = isNaN(num)? "" : (num>=0?"▲ ":"▼ ");
-  return `<div class="kpi"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="delta ${cls}">${arrow}${k.delta}</div></div>`;
-}).join('');
-
-// Charts (guarded so a chart-lib issue never blocks the table/insight below)
 const colors=['#0F5C57','#3C8C82','#C97A2E','#B3542E'];
-try{
-  if(typeof Chart === 'undefined') throw new Error('Chart.js failed to load');
+const nf = n => Math.round(n).toLocaleString('th-TH');
+const pct = (a,b)=> (((b-a)/a)*100).toFixed(1);
+
+let trendChartInst=null, rightsChartInst=null, donutCharts={};
+let currentMetric='value';
+const chartsReady = typeof Chart !== 'undefined';
+if(chartsReady){
   if(typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
   Chart.defaults.font.family = "'Sarabun', sans-serif";
+}
 
-  new Chart(document.getElementById('trendChart'),{
-    type:'line',
-    data:{labels:years.map(String),datasets:[
-      {label:'มูลค่ารวม',data:years.map(y=>totals(y).value),borderColor:'#0F5C57',backgroundColor:'#0F5C57',tension:.3,fill:false,pointRadius:4,
-        datalabels:{align:'top',color:'#0F5C57',font:{size:11,weight:600},
-          formatter:(v,ctx)=>{ if(ctx.dataIndex===0) return ''; const prev=totals(years[ctx.dataIndex-1]).value; return (v>=prev?'+':'')+(((v-prev)/prev)*100).toFixed(1)+'%'; }}},
-      {label:'มูลค่ายา',data:years.map(y=>totals(y).drug),borderColor:'#C97A2E',backgroundColor:'#C97A2E',tension:.3,fill:false,pointRadius:4,
-        datalabels:{align:'bottom',color:'#C97A2E',font:{size:11,weight:600},
-          formatter:(v,ctx)=>totals(years[ctx.dataIndex]).drugpct.toFixed(1)+'% ของมูลค่ารวม'}},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      layout:{padding:{top:10,bottom:10}},
-      plugins:{legend:{position:'top'}},
-      scales:{y:{ticks:{callback:v=>(v/1e6).toFixed(0)+'M'}}}}
-  });
+function render(dsKey){
+  const raw = datasets[dsKey];
+  const totals = y => raw.find(r=>r.y===y && r.total);
+  const t67=totals(2567), t69=totals(2569);
 
-  new Chart(document.getElementById('rightsChart'),{
-    type:'bar',
-    data:{labels:years.map(String),datasets:groups.map((g,i)=>({
-      label:groupLabel[g],
-      data:years.map(y=>raw.find(r=>r.y===y&&r.g===g).value),
-      backgroundColor:colors[i]
-    }))},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{position:'top',labels:{boxWidth:12,font:{size:11}}},
-        datalabels:{color:'#fff',font:{size:10,weight:600},rotation:-90,anchor:'center',align:'center',
-          formatter:(v,ctx)=>{ const y=years[ctx.dataIndex]; const g=groups[ctx.datasetIndex];
-            const rec=raw.find(r=>r.y===y&&r.g===g); return rec.valpct.toFixed(0)+'%'; }}
-      },
-      scales:{y:{ticks:{callback:v=>(v/1e6).toFixed(0)+'M'}}}}
-  });
+  // KPI cards
+  const kpis = [
+   {label:"มูลค่าการรักษารวม ปี 2569",value:"฿"+nf(t69.value),delta:pct(t67.value,t69.value)+"% เทียบปี 2567"},
+   {label:"มูลค่ายา ปี 2569",value:"฿"+nf(t69.drug),delta:pct(t67.drug,t69.drug)+"% เทียบปี 2567"},
+   {label:"สัดส่วนค่ายาในมูลค่ารวม 2569",value:t69.drugpct.toFixed(1)+"%",delta:"ปี 2567: "+t67.drugpct.toFixed(1)+"%"},
+   {label:"จำนวน Visit ปี 2569",value:nf(t69.visit),delta:pct(t67.visit,t69.visit)+"% เทียบปี 2567"},
+  ];
+  document.getElementById('kpiGrid').innerHTML = kpis.map(k=>{
+    const num = parseFloat(k.delta);
+    const cls = isNaN(num)? "" : (num>=0?"pos":"neg");
+    const arrow = isNaN(num)? "" : (num>=0?"▲ ":"▼ ");
+    return `<div class="kpi"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="delta ${cls}">${arrow}${k.delta}</div></div>`;
+  }).join('');
 
-  // Three synced donuts (2567 / 2568 / 2569), switchable metric
-  const donutCanvases={2567:'donut2567',2568:'donut2568',2569:'donut2569'};
-  let donutCharts={};
-  function drawDonuts(metric){
+  // Charts
+  try{
+    if(!chartsReady) throw new Error('Chart.js failed to load');
+    if(trendChartInst) trendChartInst.destroy();
+    if(rightsChartInst) rightsChartInst.destroy();
     Object.values(donutCharts).forEach(c=>c.destroy());
     donutCharts={};
+
+    trendChartInst = new Chart(document.getElementById('trendChart'),{
+      type:'line',
+      data:{labels:years.map(String),datasets:[
+        {label:'มูลค่ารวม',data:years.map(y=>totals(y).value),borderColor:'#0F5C57',backgroundColor:'#0F5C57',tension:.3,fill:false,pointRadius:4,
+          datalabels:{align:'top',color:'#0F5C57',font:{size:11,weight:600},
+            formatter:(v,ctx)=>{ if(ctx.dataIndex===0) return ''; const prev=totals(years[ctx.dataIndex-1]).value; return (v>=prev?'+':'')+(((v-prev)/prev)*100).toFixed(1)+'%'; }}},
+        {label:'มูลค่ายา',data:years.map(y=>totals(y).drug),borderColor:'#C97A2E',backgroundColor:'#C97A2E',tension:.3,fill:false,pointRadius:4,
+          datalabels:{align:'bottom',color:'#C97A2E',font:{size:11,weight:600},
+            formatter:(v,ctx)=>totals(years[ctx.dataIndex]).drugpct.toFixed(1)+'% ของมูลค่ารวม'}},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        layout:{padding:{top:10,bottom:10}},
+        plugins:{legend:{position:'top'}},
+        scales:{y:{ticks:{callback:v=>(v/1e6).toFixed(0)+'M'}}}}
+    });
+
+    rightsChartInst = new Chart(document.getElementById('rightsChart'),{
+      type:'bar',
+      data:{labels:years.map(String),datasets:groups.map((g,i)=>({
+        label:groupLabel[g],
+        data:years.map(y=>raw.find(r=>r.y===y&&r.g===g).value),
+        backgroundColor:colors[i]
+      }))},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{position:'top',labels:{boxWidth:12,font:{size:11}}},
+          datalabels:{color:'#fff',font:{size:10,weight:600},rotation:-90,anchor:'center',align:'center',
+            formatter:(v,ctx)=>{ const y=years[ctx.dataIndex]; const g=groups[ctx.datasetIndex];
+              const rec=raw.find(r=>r.y===y&&r.g===g); return rec.valpct.toFixed(0)+'%'; }}
+        },
+        scales:{y:{ticks:{callback:v=>(v/1e6).toFixed(0)+'M'}}}}
+    });
+
+    const donutCanvases={2567:'donut2567',2568:'donut2568',2569:'donut2569'};
     years.forEach(y=>{
       const rows = raw.filter(r=>r.y===y && !r.total);
-      const data = rows.map(r=>r[metric]);
+      const data = rows.map(r=>r[currentMetric]);
       donutCharts[y] = new Chart(document.getElementById(donutCanvases[y]),{
         type:'doughnut',
         data:{labels:groups.map(g=>groupLabel[g]),datasets:[{data,backgroundColor:colors}]},
@@ -230,42 +261,58 @@ try{
           }}
       });
     });
-  }
-  drawDonuts('value');
-  document.getElementById('shareLegend').innerHTML = groups.map((g,i)=>
-    `<span><span class="sw" style="background:${colors[i]}"></span>${groupLabel[g]}</span>`).join('');
-  document.querySelectorAll('.tab-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      drawDonuts(btn.dataset.metric);
+    document.getElementById('shareLegend').innerHTML = groups.map((g,i)=>
+      `<span><span class="sw" style="background:${colors[i]}"></span>${groupLabel[g]}</span>`).join('');
+  }catch(err){
+    console.error('Chart render failed:', err);
+    document.querySelectorAll('.chart-box').forEach(box=>{
+      box.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:13.5px">ไม่สามารถโหลดกราฟได้ในขณะนี้</div>';
     });
-  });
-}catch(err){
-  console.error('Chart render failed:', err);
-  document.querySelectorAll('.chart-box').forEach(box=>{
-    box.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:13.5px">ไม่สามารถโหลดกราฟได้ในขณะนี้</div>';
-  });
+  }
+
+  // Table
+  const tbody = document.querySelector('#dataTable tbody');
+  tbody.innerHTML = raw.map(r=>`<tr class="${r.total?'total':''}">
+    <td>${r.y}</td><td>${r.total?'รวมทั้งปี':groupLabel[r.g]}</td>
+    <td>${nf(r.visit)}</td><td>${r.vpct.toFixed(2)}%</td>
+    <td>${nf(r.person)}</td><td>${r.ppct.toFixed(2)}%</td>
+    <td>${nf(r.value)}</td><td>${r.valpct.toFixed(2)}%</td>
+    <td>${nf(r.drug)}</td><td>${r.drugpct.toFixed(2)}%</td>
+  </tr>`).join('');
+
+  // Insight
+  const eb2 = raw.find(r=>r.y===2567&&r.g==="2_เบิกได้เบิกตรง");
+  const eb9 = raw.find(r=>r.y===2569&&r.g==="2_เบิกได้เบิกตรง");
+  document.getElementById('insightBox').innerHTML =
+   `มูลค่าการรักษารวมเพิ่มขึ้นจาก <b>฿${nf(t67.value)}</b> ในปี 2567 เป็น <b>฿${nf(t69.value)}</b> ในปี 2569 (+${pct(t67.value,t69.value)}%) `+
+   `ในขณะที่จำนวน Visit และจำนวนผู้ป่วยแทบไม่เปลี่ยนแปลง สะท้อนว่า<b>ต้นทุนต่อการรักษาต่อครั้งสูงขึ้นชัดเจน</b> `+
+   `โดยมูลค่ายาคิดเป็นสัดส่วนสูงถึง <b>${t69.drugpct.toFixed(1)}%</b> ของมูลค่ารวมในปี 2569 และกลุ่มสิทธิ<b>เบิกได้เบิกตรง</b>มีมูลค่าเติบโตเร็วที่สุด `+
+   `(จาก ฿${nf(eb2.value)} เป็น ฿${nf(eb9.value)}, +${pct(eb2.value,eb9.value)}%) `+
+   `จึงควรพิจารณาจัดสรรงบประมาณเพิ่มเติมให้สอดคล้องกับต้นทุนยาและค่ารักษาที่สูงขึ้น แม้ปริมาณผู้รับบริการจะทรงตัว `+
+   `<br><br><i>หมายเหตุ: ข้อมูลปีงบประมาณ 2569 นับถึงวันที่ 11 กันยายน 2569 เท่านั้น ยังไม่ครบปีงบประมาณ ตัวเลขจึงมีแนวโน้มสูงขึ้นอีกเมื่อสิ้นปีงบประมาณ</i>`;
 }
 
-// Table
-const tbody = document.querySelector('#dataTable tbody');
-tbody.innerHTML = raw.map(r=>`<tr class="${r.total?'total':''}">
-  <td>${r.y}</td><td>${r.total?'รวมทั้งปี':groupLabel[r.g]}</td>
-  <td>${nf(r.visit)}</td><td>${r.vpct.toFixed(2)}%</td>
-  <td>${nf(r.person)}</td><td>${r.ppct.toFixed(2)}%</td>
-  <td>${nf(r.value)}</td><td>${r.valpct.toFixed(2)}%</td>
-  <td>${nf(r.drug)}</td><td>${r.drugpct.toFixed(2)}%</td>
-</tr>`).join('');
+// Dataset tabs (เขตสุขภาพที่ 8 / เฉพาะจังหวัดเลย)
+document.querySelectorAll('#datasetTabs .tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#datasetTabs .tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    render(btn.dataset.ds);
+  });
+});
 
-// Insight
-document.getElementById('insightBox').innerHTML =
- `มูลค่าการรักษารวมเพิ่มขึ้นจาก <b>฿${nf(t67.value)}</b> ในปี 2567 เป็น <b>฿${nf(t69.value)}</b> ในปี 2569 (+${pct(t67.value,t69.value)}%) `+
- `ในขณะที่จำนวน Visit และจำนวนผู้ป่วยแทบไม่เปลี่ยนแปลง สะท้อนว่า<b>ต้นทุนต่อการรักษาต่อครั้งสูงขึ้นชัดเจน</b> `+
- `โดยมูลค่ายาคิดเป็นสัดส่วนสูงถึง <b>${t69.drugpct.toFixed(1)}%</b> ของมูลค่ารวมในปี 2569 และกลุ่มสิทธิ<b>เบิกได้เบิกตรง</b>มีมูลค่าเติบโตเร็วที่สุด `+
- `(จาก ฿${nf(raw.find(r=>r.y===2567&&r.g==="2_เบิกได้เบิกตรง").value)} เป็น ฿${nf(raw.find(r=>r.y===2569&&r.g==="2_เบิกได้เบิกตรง").value)}, +${pct(raw.find(r=>r.y===2567&&r.g==="2_เบิกได้เบิกตรง").value,raw.find(r=>r.y===2569&&r.g==="2_เบิกได้เบิกตรง").value)}%) `+
- `จึงควรพิจารณาจัดสรรงบประมาณเพิ่มเติมให้สอดคล้องกับต้นทุนยาและค่ารักษาที่สูงขึ้น แม้ปริมาณผู้รับบริการจะทรงตัว `+
- `<br><br><i>หมายเหตุ: ข้อมูลปีงบประมาณ 2569 นับถึงวันที่ 11 กันยายน 2569 เท่านั้น ยังไม่ครบปีงบประมาณ ตัวเลขจึงมีแนวโน้มสูงขึ้นอีกเมื่อสิ้นปีงบประมาณ</i>`;
+// Metric tabs for the 3 donuts
+document.querySelectorAll('#shareTabs .tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#shareTabs .tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMetric = btn.dataset.metric;
+    const activeDs = document.querySelector('#datasetTabs .tab-btn.active').dataset.ds;
+    render(activeDs);
+  });
+});
+
+render('all');
 </script>
 </body>
 </html>
