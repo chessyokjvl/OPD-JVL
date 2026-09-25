@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>สรุปจำนวนและมูลค่าการรักษา OPD ปีงบประมาณ 2567-2569 และข้อมูล นค.1 ปีงบประมาณ 2560-2569 : รพ.จิตเวชเลยราชนครินทร์</title>
+<title>สรุปจำนวนและมูลค่าการรักษา OPD ปีงบประมาณ 2567-2569, ข้อมูล นค.1 จ.เลย และผลลัพธ์ทางการเงิน 60-69 : รพ.จิตเวชเลยราชนครินทร์</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -127,12 +127,13 @@ tbody tr.nc1-selected td{background:rgba(15,92,87,.09)}
 <div class="wrap">
 <header>
   <div class="eyebrow">กลุ่มงานพัฒนาคุณภาพบริการและมาตรฐาน · รพ.จิตเวชเลยราชนครินทร์</div>
-  <h1>จำนวนและมูลค่าการรักษาผู้ป่วยนอก (OPD) ปีงบประมาณ 2567–2569 และข้อมูล นค.1 ปีงบประมาณ 2560-2569</h1>
+  <h1>จำนวนและมูลค่าการรักษาผู้ป่วยนอก (OPD) ปีงบประมาณ 2567–2569</h1>
   <div class="meta">สรุปเชิงบริหารเพื่อประกอบการพิจารณาจัดสรรงบประมาณ · จำแนกตามกลุ่มสิทธิการรักษา<br><b>หมายเหตุ:</b> ข้อมูลปีงบประมาณ 2569 เป็นข้อมูล ณ วันที่ 11 กันยายน 2569 (ยังไม่ครบปีงบประมาณ)</div>
   <div class="tabs" id="datasetTabs" style="margin-top:16px">
     <button class="tab-btn active" data-ds="all">เขตสุขภาพที่ 8 (7 จังหวัด)</button>
     <button class="tab-btn" data-ds="loei">เฉพาะจังหวัดเลย</button>
     <button class="tab-btn" data-ds="nc1">ข้อมูล นค.1</button>
+    <button class="tab-btn" data-ds="jvl">งบประมาณ UC เหมาจ่าย</button>
   </div>
 </header>
 
@@ -278,6 +279,27 @@ tbody tr.nc1-selected td{background:rgba(15,92,87,.09)}
 
 <div class="sub" style="text-align:center;margin-top:8px">
   ข้อมูล นค.1 · ผู้ป่วยที่มารับบริการ รพ.จิตเวชเลยราชนครินทร์ จำแนกตามโรงพยาบาลเจ้าของพื้นที่ภูมิลำเนา ปีงบประมาณ 2560–2569
+</div>
+
+</div>
+
+<div id="jvlPanels" style="display:none">
+<div class="panel">
+  <h2>งบประมาณ UC เหมาจ่ายรายหัว เทียบต้นทุนและยอดขาดทุนสะสม</h2>
+  <div class="sub">เปรียบเทียบงบประมาณเหมาจ่ายที่ได้รับ ต้นทุน/ค่ายา และยอดขาดทุนสะสม ปีงบประมาณ 2560–2569 (หน่วย: ล้านบาท)</div>
+</div>
+
+<div class="kpi-grid" id="jvlKpiGrid"></div>
+
+<div class="panel">
+  <h2 class="nc1-subhead">แนวโน้มงบประมาณ ต้นทุน และยอดขาดทุนสะสม 10 ปีงบประมาณ</h2>
+  <div class="sub">แกนซ้าย: มูลค่ารายปี (งบที่ได้รับ / ต้นทุน / ขาดทุนรายปี) · แกนขวา: ยอดขาดทุนสะสม — หน่วยล้านบาท</div>
+  <div class="chart-box" style="height:380px"><canvas id="jvlChart"></canvas></div>
+</div>
+
+<div class="panel">
+  <h2>ข้อสังเกตสำหรับการพิจารณางบประมาณ</h2>
+  <div class="insight" id="jvlInsight"></div>
 </div>
 
 </div>
@@ -449,13 +471,18 @@ document.querySelectorAll('#datasetTabs .tab-btn').forEach(btn=>{
     document.querySelectorAll('#datasetTabs .tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     const ds = btn.dataset.ds;
+    document.getElementById('opdPanels').style.display='none';
+    document.getElementById('nc1Panels').style.display='none';
+    document.getElementById('jvlPanels').style.display='none';
     if(ds==='nc1'){
-      document.getElementById('opdPanels').style.display='none';
       document.getElementById('nc1Panels').style.display='';
       if(!nc1Initialized){ nc1Init(); nc1Initialized=true; }
       else { nc1ResizeCharts(); }
+    } else if(ds==='jvl'){
+      document.getElementById('jvlPanels').style.display='';
+      if(!jvlInitialized){ jvlInit(); jvlInitialized=true; }
+      else { jvlResizeChart(); }
     } else {
-      document.getElementById('nc1Panels').style.display='none';
       document.getElementById('opdPanels').style.display='';
       render(ds);
     }
@@ -941,6 +968,136 @@ document.getElementById('nc1ResetBtn').addEventListener('click', ()=>{
   document.querySelectorAll('#nc1HospChips .chip').forEach(c=>c.classList.remove('active'));
   nc1RenderAll();
 });
+
+
+/* =========================================================
+   งบประมาณ UC เหมาจ่าย vs ต้นทุน vs ขาดทุนสะสม (namespaced jvl*)
+   ========================================================= */
+const JVL_YEARS = ['2560','2561','2562','2563','2564','2565','2566','2567','2568','2569'];
+const JVL_CUM_LOSS   = [1.72, 4.48, 8.00, 11.67, 15.30, 17.96, 20.62, 24.52, 29.26, 34.27];
+const JVL_COST       = [8.42, 9.46, 10.22, 10.37, 10.33, 10.36, 10.36, 11.90, 13.04, 13.51];
+const JVL_BUDGET     = [6.70, 6.70, 6.70, 6.70, 6.70, 7.70, 7.70, 8.00, 8.30, 8.50];
+const JVL_ANNUAL_LOSS= [1.72, 2.76, 3.52, 3.67, 3.63, 2.66, 2.66, 3.90, 4.74, 5.01];
+
+let jvlChart, jvlInitialized = false;
+
+function jvlNf(v){ return v.toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function jvlPct(a,b){ return (((b-a)/a)*100).toFixed(1); }
+
+function jvlRenderKPI(){
+  const n = JVL_YEARS.length;
+  const kpis = [
+    {label:`งบประมาณเหมาจ่ายที่ได้รับ ปี ${JVL_YEARS[n-1]}`, value:'฿'+jvlNf(JVL_BUDGET[n-1])+' ล้าน', delta: jvlPct(JVL_BUDGET[0], JVL_BUDGET[n-1])+'% เทียบปี '+JVL_YEARS[0]},
+    {label:`ต้นทุน/ค่ายา ปี ${JVL_YEARS[n-1]}`, value:'฿'+jvlNf(JVL_COST[n-1])+' ล้าน', delta: jvlPct(JVL_COST[0], JVL_COST[n-1])+'% เทียบปี '+JVL_YEARS[0]},
+    {label:`ขาดทุนรายปี ปี ${JVL_YEARS[n-1]}`, value:'฿'+jvlNf(JVL_ANNUAL_LOSS[n-1])+' ล้าน', delta: jvlPct(JVL_ANNUAL_LOSS[n-2], JVL_ANNUAL_LOSS[n-1])+'% เทียบปี '+JVL_YEARS[n-2]},
+    {label:'ยอดขาดทุนสะสม (10 ปี)', value:'฿'+jvlNf(JVL_CUM_LOSS[n-1])+' ล้าน', delta:'เพิ่มขึ้น '+(JVL_CUM_LOSS[n-1]/JVL_CUM_LOSS[0]).toFixed(1)+' เท่าเทียบปี '+JVL_YEARS[0]},
+  ];
+  document.getElementById('jvlKpiGrid').innerHTML = kpis.map(k=>{
+    const num = parseFloat(k.delta);
+    const cls = isNaN(num)? '' : (num>=0?'neg':'pos'); // cost/loss growth is "bad" -> red; but budget growth is neutral/good -> keep simple: rising cost/loss = neg(red), rising budget = pos handled below
+    const arrow = isNaN(num)? '' : (num>=0?'▲ ':'▼ ');
+    return `<div class="kpi"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="delta ${cls}">${arrow}${k.delta}</div></div>`;
+  }).join('');
+  // budget growth should read as neutral (not red); override first card's class to neutral by re-render with explicit class
+  const cards = document.querySelectorAll('#jvlKpiGrid .kpi');
+  if(cards[0]){ const d = cards[0].querySelector('.delta'); if(d){ d.classList.remove('neg'); d.classList.add('pos'); } }
+}
+
+function jvlInitCharts(){
+  const ctx = document.getElementById('jvlChart').getContext('2d');
+  jvlChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: JVL_YEARS,
+      datasets: [
+        {
+          label: 'ยอดขาดทุนสะสม (ล้านบาท)',
+          data: JVL_CUM_LOSS,
+          type: 'line',
+          backgroundColor: 'rgba(179, 84, 46, 0.10)',
+          borderColor: 'rgba(179, 84, 46, 0.35)',
+          borderWidth: 2,
+          fill: true,
+          pointRadius: 0,
+          yAxisID: 'y1',
+          datalabels: {display:false}
+        },
+        {
+          label: 'ต้นทุน/ค่ายา (ล้านบาท)',
+          data: JVL_COST,
+          borderColor: '#B3542E',
+          backgroundColor: '#B3542E',
+          borderWidth: 3,
+          pointRadius: 4,
+          yAxisID: 'y',
+          datalabels: {display:false}
+        },
+        {
+          label: 'งบประมาณเหมาจ่ายที่ได้รับ (ล้านบาท)',
+          data: JVL_BUDGET,
+          borderColor: '#0F5C57',
+          backgroundColor: '#0F5C57',
+          borderWidth: 3,
+          pointRadius: 4,
+          yAxisID: 'y',
+          datalabels: {display:false}
+        },
+        {
+          label: 'ขาดทุนรายปี (ล้านบาท)',
+          data: JVL_ANNUAL_LOSS,
+          borderColor: '#C97A2E',
+          backgroundColor: '#C97A2E',
+          borderDash: [5, 5],
+          borderWidth: 2,
+          pointRadius: 3,
+          yAxisID: 'y',
+          datalabels: {display:false}
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {position:'top', labels:{boxWidth:12, font:{size:11.5}}},
+        datalabels: {display:false}
+      },
+      scales: {
+        y: {
+          type: 'linear', display: true, position: 'left',
+          title: { display: true, text: 'มูลค่ารายปี (ล้านบาท)' },
+          min: 0, max: 16,
+          grid:{color:'rgba(0,0,0,.06)'}
+        },
+        y1: {
+          type: 'linear', display: true, position: 'right',
+          title: { display: true, text: 'ยอดขาดทุนสะสมรวม (ล้านบาท)' },
+          min: 0, max: 40,
+          grid: { drawOnChartArea: false }
+        }
+      }
+    }
+  });
+}
+
+function jvlResizeChart(){ if(jvlChart) jvlChart.resize(); }
+
+function jvlRenderInsight(){
+  const n = JVL_YEARS.length;
+  document.getElementById('jvlInsight').innerHTML =
+    `งบประมาณเหมาจ่ายรายหัวที่ได้รับเพิ่มขึ้นจาก <b>฿${jvlNf(JVL_BUDGET[0])} ล้านบาท</b> ในปี ${JVL_YEARS[0]} เป็น <b>฿${jvlNf(JVL_BUDGET[n-1])} ล้านบาท</b> ในปี ${JVL_YEARS[n-1]} (+${jvlPct(JVL_BUDGET[0],JVL_BUDGET[n-1])}%) `+
+    `ขณะที่ต้นทุน/ค่ายาเพิ่มขึ้นจาก <b>฿${jvlNf(JVL_COST[0])} ล้านบาท</b> เป็น <b>฿${jvlNf(JVL_COST[n-1])} ล้านบาท</b> (+${jvlPct(JVL_COST[0],JVL_COST[n-1])}%) ซึ่งเป็นอัตราการเติบโตที่<b>สูงกว่างบประมาณที่ได้รับอย่างชัดเจน</b> `+
+    `ส่งผลให้เกิดการขาดทุนต่อเนื่องทุกปี และยอดขาดทุนสะสมพุ่งขึ้นจาก ฿${jvlNf(JVL_CUM_LOSS[0])} ล้านบาท เป็น <b>฿${jvlNf(JVL_CUM_LOSS[n-1])} ล้านบาท</b> ภายใน 10 ปีงบประมาณ (เพิ่มขึ้น ${(JVL_CUM_LOSS[n-1]/JVL_CUM_LOSS[0]).toFixed(1)} เท่า) `+
+    `โดยขาดทุนรายปีล่าสุด (${JVL_YEARS[n-1]}) อยู่ที่ <b>฿${jvlNf(JVL_ANNUAL_LOSS[n-1])} ล้านบาท</b> ซึ่งเป็นระดับสูงสุดในรอบ 10 ปี `+
+    `จึงควรพิจารณาทบทวนอัตราเหมาจ่ายรายหัวให้สอดคล้องกับต้นทุนค่ายาและค่ารักษาที่แท้จริง เพื่อลดภาระขาดทุนสะสมของโรงพยาบาลในระยะยาว`;
+}
+
+function jvlInit(){
+  jvlRenderKPI();
+  jvlInitCharts();
+  jvlRenderInsight();
+}
 
 
 render('all');
